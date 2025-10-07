@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All the Fishes</title>
+    <style>
+        canvas {
+            filter:hue-rotate(-30deg);
+            
+        }
+    </style>
+</head>
+
+<body>
+    <script type="module">
+
+        //Import pixi
+        import {
+            Application,
+            Assets,
+            Sprite,
+            Container
+        } from './js/pixi.js';
+
+
+        //Create application
+        const app = new Application();
+
+        //Initialize the application
+        await app.init({
+            width: 640,
+            height: 480,
+        });
+        document.body.appendChild(app.canvas);
+
+        // Background
+        const bgTexture = await Assets.load('img/aquarium.jpg');
+        const background = new Sprite(bgTexture);
+        // Position 
+        background.width = 640;
+        background.height = 480;
+        // Add to stage
+        app.stage.addChildAt(background, 0);
+        
+
+        //Load the fish texture
+        const texture = await Assets.load('img/yellow_fish.png');
+
+        //Create sprite from an image path
+        const fishsprite1 = new Sprite(texture);
+        const fishsprite2 = new Sprite(texture);
+        const fishsprite3 = new Sprite(texture);
+
+        //Create animiation container
+        const deadfish = new Container();
+            deadfish.x = 600;
+            deadfish.angle = 180;
+            deadfish.tint = 0x40BB80;
+        const funfish = new Container();
+
+        //Add to container
+        deadfish.addChild(fishsprite1, fishsprite2);
+        funfish.addChild(fishsprite3);
+
+        //Add container to stage
+        app.stage.addChild(deadfish, funfish);
+
+        //Alter sprite parameters
+        fishsprite1.scale.set(.40);
+
+        fishsprite2.scale.set(.25);
+        fishsprite2.x = 250;
+        fishsprite2.y = 40;
+
+        fishsprite3.anchor.set(.5);
+        fishsprite3.scale.set(.40);
+        fishsprite3.tint= 0xFFFF00;
+
+        //Animation ticker
+        app.ticker.add((time) => {
+
+            let tick = time.lastTime;
+
+            //Fish bobbing
+            let bobbing = Math.sin(tick / 500)*5;
+            deadfish.y = 90 + bobbing;
+            
+
+            // Fish moving
+            funfish.x = app.screen.width / 2 + Math.sin(tick / 1000) * app.screen.width / 4;
+            funfish.y = app.screen.height / 1.6 + Math.sin(tick / 2000) * app.screen.height / 9;
+
+            // Fish flap
+            // let flap = .3 + Math.sin(tick / 30) * .005;
+            // fishsprite1.scale.set(flap, .3);
+
+            //Rotate the fish
+            fishsprite3.angle = .3 * tick;
+        });
+
+        
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script type="module">
+
+        //Import pixi
+        import {
+            Application,
+            Assets,
+            Sprite,
+            Container,
+            Graphics,
+            Text,
+            TextStyle
+        } from './js/pixi.js';
+
+        //Create application
+        const app = new Application();
+
+        //Initialize the application
+        await app.init({
+            background: 0x440000,
+            width: 640,
+            height: 480,
+        });
+        document.body.appendChild(app.canvas);
+        
+        //Making a button!!!
+        // let whatever = new Button("Name", 200, 60);
+        class Button extends Container {
+
+            constructor(l, w, h) {
+                super(); //Sets up old object
+
+                //Build the button
+                this.l = l;
+                this.w = w;
+                this.h = h;
+                this.c = 0xFFFFFF;
+
+                //Make it listen for events
+                this.eventMode = 'static'; 
+
+                //Draw the button
+                this.draw();
+
+                //Set hover states
+                this.on('mouseover', () => {
+                    this.alpha = .85;
+                    this.cursor = "pointer";
+                })
+                this.on('mouseout', () => {
+                    this.alpha = 1;
+                    this.cursor = "auto";
+                })
+
+            }
+            //Actually set everything up
+            draw(){
+                //Empty it out
+                while(this.children.length > 0)
+                    this.removeChildAt(0);
+
+                //The body
+                this.body = new Graphics()
+                            .rect(0,0,this.w, this.h)
+                            .fill(this.c);
+                this.addChild(this.body);
+
+                //The label
+                this.label = new Text({
+                    text: this.l,
+                    anchor: .5
+                });
+                this.label.x = this.w/2;
+                this.label.y = this.h/2;
+                this.addChild(this.label);
+            }
+            //Set the label
+            setLabel(name){
+                this.l = name;
+                this.label.text = name;
+                this.draw();
+            }
+            //Set color
+            setColor(color){
+                this.c = color;
+                this.draw();
+            }
+            //Set size
+            setSize(w, h){
+                this.w = w;
+                this.h = h;
+                this.draw();
+
+            }
+
+        }
+        
+        let button = new Button("Test", 200, 60);
+            button.x = 100;
+            button.y = 200;
+            button.setLabel("Hello there!");
+            button.setColor("pink");
+            button.setSize(200,100);
+        console.log(button.l, button.w, button.h);
+        app.stage.addChild(button);
+
+        button.on('click', () => {
+            alert("Clicked!");
+        });
+
+        //This one will be draggable
+        let button2 = new Button("Hi there!", 200, 40);
+            button2.x = 400;
+            button2.y = 400;
+
+        app.stage.addChild(button2);
+
+        //Set flag
+        let dragging = false;
+
+        //Begin dragging (pointerdown)
+        button2.on('pointerdown', () => {
+            dragging = true; console.log("Down");
+        });
+        //Dragging
+        button2.on('globalpointermove', (event) => {
+            console.log(event.global);
+            if (dragging) {
+                button2.x = event.global.x - button2.w/2;
+                button2.y = event.global.y - button2.h/2;
+            }
+        });
+
+        //End dragging (pointerup and pointerupoutside)
+        button2.on('pointerup', () => {
+            dragging = false; console.log("Up");
+        });
+        button2.on('pointerupoutside', () => {
+            dragging = false; console.log("Up");
+        });
+
+        //---------------------------------------------------------
+        class Slider extends Container {
+
+            constructor(w) {
+                super(); 
+
+                this.w = w;
+                //Track
+                this.track = new Graphics()
+                            .rect(0,0,w,5)
+                            .fill("grey");
+                this.addChild(this.track);
+
+                //Button
+                this.button = new Button("", 20, 20);
+                this.addChild(this.button);
+
+            }
+            
+
+        }
+        
+
+        let s = new Slider(300);
+            s.x = 200;
+            s.y = 100;
+        app.stage.addChild(s);
+        /*
+        //Ticker
+        let hovering = false;
+
+        // Create a rectangle
+        let g = new Graphics();
+            g.rect(0,0,200,60);
+            g.fill("pink");
+            g.eventMode = 'static';
+
+            g.on('pointerenter', () => {
+                hovering = true;
+            })
+            g.on('pointerleave', () => {
+                hovering = false;
+                g.tint = 0xFFFFFF;
+            })
+            g.on('pointermove', () => {
+                g.tint = 0xFFFFFF * Math.random();
+            })
+            g.on('pointertap', () => {
+                alert("Clicked!");
+            })
+        
+        // Add to stage
+        app.stage.addChild(g);
+        
+        //Animation Ticker
+        app.ticker.add((time) => {
+            if(hovering)
+                g.tint = 0xFFFFFF * Math.random();
+        });
+        */
+
+    </script>
+</body >
+</html >
