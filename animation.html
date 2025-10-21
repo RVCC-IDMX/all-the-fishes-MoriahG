@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animations</title>
+</head>
+<body>
+    <script type="module">
+
+        //Import pixi
+        import {
+            Application,
+            Assets,
+            Sprite,
+            Container,
+            Graphics,
+            Text,
+            TextStyle
+        } from './js/pixi.js';
+
+        //Import animate
+        import { Animate, Sleep} from './js/animate.js';
+
+        //Create application
+        const app = new Application();
+
+        //Initialize the application
+        await app.init({
+            background: 0xCC6666,
+            width: 640,
+            height: 480,
+        });
+
+        document.body.appendChild(app.canvas);
+
+        //Load the fish texture
+        const texture = await Assets.load('img/yellow_fish.png');
+
+        //Create sprite from an image path
+        const fishsprite1 = new Sprite(texture);
+        fishsprite1.scale.set(.5);
+        
+        app.stage.addChild(fishsprite1);
+
+        async function swim() {
+            await Sleep(1000);
+            await Animate.to(fishsprite1, {
+                duration:1000,
+                x: 300,
+                y: 300,
+                tint: 0xFF0000,
+                easing: Animate.easeInOut
+            })
+            await Animate.to(fishsprite1, {
+                duration:1000,
+                x: 300,
+                y: 100,
+                tint: 0xFFFFFF,
+                easing: Animate.easeInOut
+            })
+            swim();
+        }
+        swim();
+
+        //Do scale and rotation animation
+
+
+    </script>
+</body>
+</html>
