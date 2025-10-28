@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animations</title>
+</head>
+<body>
+    <script type="module">
+
+        //Import pixi
+        import {
+            Application,
+            Assets,
+            Sprite,
+            Container,
+            Graphics,
+            Text,
+            TextStyle
+        } from './js/pixi.js';
+
+        //Import animate
+        import { Animate, Sleep} from './js/animate.js';
+
+        import { Button } from './js/button.js';
+        import { Director } from './js/director.js';
+
+        //Create application
+        const app = new Application();
+
+        //Initialize the application
+        await app.init({
+            background: 0xCC6666,
+            width: 640,
+            height: 480,
+        });
+
+        document.body.appendChild(app.canvas);
+
+        //Load the fish texture
+        const texture = await Assets.load('img/yellow_fish.png');
+
+        //Create sprite from an image path
+        const fishsprite1 = new Sprite(texture);
+        fishsprite1.scale.set(.5);
+        
+        app.stage.addChild(fishsprite1);
+
+        //Bring in the Director
+        let director = new Director(app.stage);
+        
+        //Create some scenes
+
+        //Scene 1
+        let scene1 = new Container();
+            scene1.addChild(fishsprite1);
+
+        let button1 = new Button("Button",200,50);
+            button1.x = app.canvas.width - button1.w;
+            button1.y = app.canvas.height - button1.h;
+            scene1.addChild(button1);
+
+        director.addScene("scene1", scene1);
+
+        //Scene 2
+        let scene2 = new Container();
+
+        let button2 = new Button("Button",200,50);
+            button2.y = app.canvas.height - button2.h;
+            scene2.addChild(button2);
+
+        director.addScene("scene2", scene2);
+
+        //Rig up buttons
+        button1.on("click", () => {
+            director.showScene("scene2");
+        });
+
+        button2.on("click", () => {
+            director.showScene("scene1");
+        });
+
+
+    </script>
+</body>
+</html>

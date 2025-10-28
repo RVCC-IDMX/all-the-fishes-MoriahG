@@ -15,3 +15,6 @@ In an endeavor to be the greatest JavaScripter alive, I have used PixiJS to crea
     Pixabay\
     Image by Schwarzenarzisse, 2015\
     https://pixabay.com/illustrations/isolated-fish-yellow-964341/
+
+**Starfish:**
+    https://picryl.com/media/starfish-sea-holiday-nature-landscapes-23a184 

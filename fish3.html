@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All the Fishes Part 3</title>
+    <style>
+        canvas {
+            filter:hue-rotate(-30deg);
+            
+        }
+    </style>
+</head>
+
+<body>
+    <script type="module">
+
+        //Import pixi
+        import {
+            Application,
+            Assets,
+            Sprite,
+            Container,
+            Graphics,
+            Text,
+            TextStyle
+        } from './js/pixi.js';
+
+        //Import animate
+        import { Animate, Sleep} from './js/fish3animate.js';
+
+
+        //Create application
+        const app = new Application();
+
+        //Initialize the application
+        await app.init({
+            width: 640,
+            height: 600,
+            background: 0x141414,
+        });
+        document.body.appendChild(app.canvas);
+
+        // Background
+        const bgTexture = await Assets.load('img/aquarium.jpg');
+        const background = new Sprite(bgTexture);
+        // Position 
+        background.width = 640;
+        background.height = 480;
+        // Add to stage
+        app.stage.addChildAt(background, 0);
+        
+
+        //Load the fish texture
+        const texture = await Assets.load('img/yellow_fish.png');
+        const starTexture = await Assets.load('img/starfish.png');
+
+        //Create sprite from an image path
+        const starfish = new Sprite(starTexture);
+        const fishsprite1 = new Sprite(texture);
+        const fishsprite2 = new Sprite(texture);
+        const fishsprite3 = new Sprite(texture);
+
+        //Create animiation container
+        const deadfish = new Container();
+            deadfish.x = 600;
+            deadfish.angle = 180;
+            deadfish.tint = 0x40BB80;
+            deadfish.anchor = (.5);
+        const funfish = new Container();
+
+        //Add to container
+        deadfish.addChild(fishsprite1, fishsprite2);
+        funfish.addChild(fishsprite3);
+
+        //Add container to stage
+        app.stage.addChild(starfish);
+        app.stage.addChild(deadfish, funfish);
+
+        //Alter sprite parameters
+        starfish.scale.set(.2);
+        starfish.anchor.set(.5);
+        starfish.y = 250;
+        starfish.x = 80;
+
+        fishsprite1.scale.set(.40);
+        fishsprite1.x = 0;
+
+        fishsprite2.scale.set(.25);
+        fishsprite2.x = 250;
+        fishsprite2.y = 40;
+
+        fishsprite3.anchor.set(.5);
+        fishsprite3.scale.set(.40);
+        fishsprite3.tint= 0xFFFF00;
+
+        //Animation ticker
+        app.ticker.add((time) => {
+
+            let tick = time.lastTime;
+
+            //Fish bobbing
+            let bobbing = Math.sin(tick / 500)*5;
+            deadfish.y = 90 + bobbing;
+            
+
+            // Fish moving
+            funfish.x = app.screen.width / 2 + Math.sin(tick / 1000) * app.screen.width / 4;
+            funfish.y = app.screen.height / 2.2 + Math.sin(tick / 2000) * app.screen.height / 9;
+
+            //Rotate the fish
+            fishsprite3.angle = .3 * tick;
+        });
+        
+        // Making button
+        // let whatever = new Button("Name", 200, 60);
+        class Button extends Container {
+
+            constructor(l, w, h) {
+                super(); //Sets up old object
+
+                //Build the button
+                this.l = l;
+                this.w = w;
+                this.h = h;
+                this.c = 0xFFFFFF;
+
+                //Make it listen for events
+                this.eventMode = 'static'; 
+
+                //Draw the button
+                this.draw();
+
+                //Set hover states
+                this.on('pointerover', () => {
+                    this.tint = "lightblue";
+                    this.cursor = "pointer";
+                })
+                this.on('pointerout', () => {
+                    this.tint = "white";
+                    this.cursor = "auto";
+                })
+                this.on('pointerdown', () => {
+                    fishsprite3.tint = 0xFFFFFF * Math.random();
+                    this.cursor = "pointer";
+                })
+
+            }
+            //Button set up
+            draw(){
+                //Empty it out
+                while(this.children.length > 0)
+                    this.removeChildAt(0);
+
+                //The body
+                this.body = new Graphics()
+                            .rect(0,0,this.w, this.h)
+                            .fill(this.c);
+                this.addChild(this.body);
+
+                //The label
+                this.label = new Text({
+                    text: this.l,
+                    anchor: .5
+                });
+                this.label.x = this.w/2;
+                this.label.y = this.h/2;
+                this.addChild(this.label);
+            }
+            //Set the label
+            setLabel(name){
+                this.l = name;
+                this.label.text = name;
+                this.draw();
+            }
+            //Set color
+            setColor(color){
+                this.c = color;
+                this.draw();
+            }
+            //Set size
+            setSize(w, h){
+                this.w = w;
+                this.h = h;
+                this.draw();
+
+            }
+
+        }
+        
+        let button = new Button("Feed Fish", 160, 60);
+            button.x = 30;
+            button.y = app.screen.height - (button.h + 30);
+            button.setColor("white");
+        app.stage.addChild(button);
+
+        //---------------Draggable dead fish---------------
+        
+        
+        //-------fishsprite1-------
+        fishsprite1.eventMode = 'static';
+        fishsprite1.interactive = true;
+        fishsprite1.cursor = "pointer";
+
+        //-------fishsprite2-------
+        fishsprite2.eventMode = 'static';
+        fishsprite2.interactive = true;
+        fishsprite2.cursor = "pointer";
+
+        //Begin dragging (pointerdown)
+        function onPointerDown() {
+            this.dragging = true; console.log("Down");
+        }
+        
+        //Dragging
+        function onGlobalPointerMove(event) {
+            console.log(event.global);
+            if (this.dragging) {
+                const local = this.parent.toLocal(event.global);
+                this.x = local.x - (this.width/2);
+                this.y = local.y - (this.height/2);
+            }
+        }
+
+        //End dragging (pointerup and pointerupoutside)
+        function onPointerUp() {
+           this.dragging = false; console.log("Up");
+        }
+        function onPointerUpOutside(){
+            this.dragging = false; console.log("Up");
+        }
+
+        fishsprite1.on('pointerdown', onPointerDown);
+        fishsprite1.on('globalpointermove', onGlobalPointerMove);
+        fishsprite1.on('pointerup', onPointerUp);
+        fishsprite1.on('pointerupoutside', onPointerUpOutside);
+
+        fishsprite2.on('pointerdown', onPointerDown);
+        fishsprite2.on('globalpointermove', onGlobalPointerMove);
+        fishsprite2.on('pointerup', onPointerUp);
+        fishsprite2.on('pointerupoutside', onPointerUpOutside);
+
+        async function swim() {
+            await Animate.to(starfish, {
+                duration:1000,
+                x: 80,
+                y: 250,
+                tint: 0xFF0000,
+                alpha: 1,
+                //scale: .2,
+                angle: 0
+            })
+            await Animate.to(starfish, {
+                duration:1000,
+                x: 80,
+                y: 250,
+                tint: 0x000000,
+                alpha: .2,
+                //scale: .5,
+                angle: 360
+            })
+            swim();
+        }
+        swim();
+
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
